@@ -6,7 +6,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: 6.42
   File::Slurp: 0
-  Tapper::Test: 3.000001
+  Tapper::Test: 3.000002
   Test::More: 0
   Test::Perl::Critic: 0
 configure_requires:
@@ -38,8 +38,8 @@ requires:
   MooseX::Daemonize: 0
   Net::Server::PreForkSimple: 0
   TAP::Parser: 0
-  Tapper::Config: 3.000001
-  Tapper::Schema: 3.000001
-  Tapper::TAP::Harness: 3.000001
+  Tapper::Config: 3.000002
+  Tapper::Schema: 3.000002
+  Tapper::TAP::Harness: 3.000002
   perl: 5.010
-version: 3.000001
+version: 3.000002
