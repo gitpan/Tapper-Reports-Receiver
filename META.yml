@@ -36,10 +36,11 @@ requires:
   Module::Build: 0
   Moose: 0
   MooseX::Daemonize: 0
+  MooseX::Log::Log4perl: 0.42
   Net::Server::PreForkSimple: 0
   TAP::Parser: 0
   Tapper::Config: 3.000002
   Tapper::Schema: 3.000002
   Tapper::TAP::Harness: 3.000002
   perl: 5.010
-version: 3.000002
+version: 3.000003
