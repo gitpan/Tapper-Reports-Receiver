@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '3.000003';
+our $VERSION = '3.000004';
 
 use AnyEvent;
 use AnyEvent::Socket;
@@ -74,7 +74,7 @@ sub run
 
 =head1 NAME
 
-Tapper::Reports::Receiver - Tapper - Receiver for Tapper test reports
+Tapper::Reports::Receiver - Tapper - Receiver for Tapper test reports as TAP or TAP::Archive
 
 
 =head1 SYNOPSIS
