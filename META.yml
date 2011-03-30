@@ -39,10 +39,11 @@ requires:
   Net::Server::PreForkSimple: 0
   TAP::Parser: 0
   Tapper::Config: 3.000002
+  Tapper::Model: 3.000002
   Tapper::Schema: 3.000002
   Tapper::TAP::Harness: 3.000002
   perl: 5.010
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Tapper-Reports-Receiver
   repository: git://github.com/amd/Tapper-Reports-Receiver.git
-version: 3.000004
+version: 3.000005

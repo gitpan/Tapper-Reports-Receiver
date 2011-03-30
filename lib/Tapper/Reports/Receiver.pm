@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '3.000004';
+our $VERSION = '3.000005';
 
 use AnyEvent;
 use AnyEvent::Socket;
@@ -53,8 +53,8 @@ sub run
                            if ($received_bytes <= 0) {
                                    undef $read_watcher;
                                    $condvar->send($message);
-        }
-}
+                           }
+                   }
                );
                 my $timeout_watcher = 
                   AnyEvent->timer (
