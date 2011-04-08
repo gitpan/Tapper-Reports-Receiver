@@ -1,17 +1,18 @@
 ---
 abstract: 'Tapper - Receiver for Tapper test reports as TAP or TAP::Archive'
 author:
+  - 'AMD OSRC Tapper Team, C<< <tapper at amd64.org> >>'
   - 'AMD OSRC Tapper Team <tapper@amd64.org>'
 build_requires:
   ExtUtils::MakeMaker: 6.42
   File::Slurp: 0
-  Tapper::Test: 3.000002
+  Tapper::Test: 3.000010
   Test::More: 0
   Test::Perl::Critic: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.42
 distribution_type: module
-generated_by: 'Module::Install version 0.91'
+generated_by: 'Module::Install version 1.00'
 license: freebsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -38,12 +39,12 @@ requires:
   MooseX::Log::Log4perl: 0.42
   Net::Server::PreForkSimple: 0
   TAP::Parser: 0
-  Tapper::Config: 3.000002
-  Tapper::Model: 3.000002
-  Tapper::Schema: 3.000002
-  Tapper::TAP::Harness: 3.000002
+  Tapper::Config: 3.000010
+  Tapper::Model: 3.000010
+  Tapper::Schema: 3.000010
+  Tapper::TAP::Harness: 3.000010
   perl: 5.010
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Tapper-Reports-Receiver
   repository: git://github.com/amd/Tapper-Reports-Receiver.git
-version: 3.000005
+version: 3.000010
