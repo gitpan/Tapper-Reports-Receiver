@@ -1,4 +1,11 @@
 package Tapper::Reports::Receiver::Util;
+BEGIN {
+  $Tapper::Reports::Receiver::Util::AUTHORITY = 'cpan:AMD';
+}
+{
+  $Tapper::Reports::Receiver::Util::VERSION = '4.0.1';
+}
+# ABSTRACT: Receive test reports
 
 use 5.010;
 use strict;
@@ -8,38 +15,31 @@ use Data::Dumper;
 use DateTime::Format::Natural;
 use File::MimeInfo::Magic;
 use IO::Scalar;
-use Log::Log4perl;
 use Moose;
 use YAML::Syck;
+use Devel::Backtrace;
 
 use Tapper::Config;
 use Tapper::Model 'model';
 use Tapper::TAP::Harness;
 
+extends 'Tapper::Base';
 
-with 'MooseX::Log::Log4perl';
+has report => (is => 'rw');
+has tap    => (is => 'rw');
 
 
-has report => (is => 'rw',
-              );
-has tap => (is => 'rw');
-            
-             
 
-=head2 start_new_report
+sub cfg
+{
+        my ($self) = @_;
+        return Tapper::Config->subconfig();
+}
 
-Create database entries to store the new report.
-
-@param string - remote host name
-@param int    - remote port
-
-@return success - report id
-
-=cut
 
 sub start_new_report {
         my ($self, $host, $port) = @_;
-        
+
         $self->report( model('ReportsDB')->resultset('Report')->new({
                                                                      peerport => $port,
                                                                      peerhost => $host,
@@ -61,22 +61,15 @@ sub tap_mimetype {
         return mimetype($TAPH);
 }
 
+
 sub tap_is_archive
 {
         my ($self) = shift;
 
-        return $self->tap_mimetype =~ m,application/x-(compressed-tar|gzip), ? 1 : 0;
+        return $self->tap_mimetype =~ m,application/(octet-stream|x-(compressed-tar|gzip)), ? 1 : 0;
 }
 
 
-=head2 write_tap_to_db
-
-Put tap string into database.
-
-@return success - undef
-@return error   - die
-
-=cut
 
 sub write_tap_to_db
 {
@@ -87,6 +80,7 @@ sub write_tap_to_db
         $self->report->tap->update;
         return;
 }
+
 
 sub get_suite {
         my ($self, $suite_name, $suite_type) = @_;
@@ -105,6 +99,7 @@ sub get_suite {
         }
         return $suite;
 }
+
 
 sub create_report_sections
 {
@@ -131,6 +126,7 @@ sub create_report_sections
         }
 }
 
+
 sub update_reportgroup_testrun_stats
 {
         my ($self, $testrun_id) = @_;
@@ -145,17 +141,20 @@ sub update_reportgroup_testrun_stats
         $reportgroupstats->update;
 }
 
+
 sub create_report_groups
 {
         my ($self, $parsed_report) = @_;
 
         my ($reportgroup_arbitrary,
             $reportgroup_testrun,
-            $reportgroup_primary
+            $reportgroup_primary,
+            $owner
            ) = (
                 $parsed_report->{db_report_reportgroup_meta}{reportgroup_arbitrary},
                 $parsed_report->{db_report_reportgroup_meta}{reportgroup_testrun},
                 $parsed_report->{db_report_reportgroup_meta}{reportgroup_primary},
+                $parsed_report->{db_report_reportgroup_meta}{owner},
                );
 
         if ($reportgroup_arbitrary and $reportgroup_arbitrary ne 'None') {
@@ -164,22 +163,32 @@ sub create_report_groups
                       report_id     => $self->report->id,
                       arbitrary_id  => $reportgroup_arbitrary,
                       primaryreport => $reportgroup_primary,
+                      owner         => $owner,
                      });
                 $reportgroup->insert;
         }
 
         if ($reportgroup_testrun and $reportgroup_testrun ne 'None') {
+                if (not $owner) {
+                        # don't check existance of each element in the search chain
+                        eval {
+                                $owner = model('TestrunDB')->resultset('Testrun')->find($reportgroup_testrun)->owner->login;
+                        };
+                }
+
                 my $reportgroup = model('ReportsDB')->resultset('ReportgroupTestrun')->new
                     ({
                       report_id     => $self->report->id,
                       testrun_id    => $reportgroup_testrun,
                       primaryreport => $reportgroup_primary,
+                      owner         => $owner,
                      });
                 $reportgroup->insert;
 
                 $self->update_reportgroup_testrun_stats($reportgroup_testrun);
         }
 }
+
 
 sub create_report_comment
 {
@@ -196,6 +205,7 @@ sub create_report_comment
                 $reportcomment->insert;
         }
 }
+
 
 sub update_parsed_report_in_db
 {
@@ -237,57 +247,156 @@ sub update_parsed_report_in_db
 
 }
 
+
+sub forward_to_level2_receivers
+{
+        my ($self) = @_;
+
+        my @level2_receivers = (keys %{$self->cfg->{receiver}{level2} || {}});
+
+        foreach my $l2receiver (@level2_receivers) {
+                $self->log->debug( "L2 receiver: $l2receiver" );
+
+                my $options = $self->cfg->{receiver}{level2}{$l2receiver};
+                next if $options->{disabled};
+
+                my $l2r_class = "Tapper::Reports::Receiver::Level2::$l2receiver";
+                eval "use $l2r_class"; ## no critic
+                if ($@) {
+                        return "Could not load $l2r_class";
+                } else {
+                        no strict 'refs'; ## no critic
+                        $self->log->debug( "Call ${l2r_class}::submit()" );
+                        my ($error, $retval) = &{"${l2r_class}::submit"}($self, $self->report, $options);
+                        if ($error) {
+                                $self->log->error( "Error calling ${l2r_class}::submit: " . $retval );
+                                return $retval;
+                        }
+                        return 0;
+                }
+        }
+}
+
+
+
+sub process_request
+{
+        my ($self, $tap) = @_;
+
+        $SIG{CHLD} = 'IGNORE';
+        my $pid = fork();
+        if ($pid == 0) {
+                $0 = "tapper-reports-receiver-".$self->report->id;
+                $SIG{USR1} = sub {
+                        local $SIG{USR1}  = 'ignore'; # make handler reentrant, don't handle signal twice
+                        my $backtrace = Devel::Backtrace->new(-start=>2, -format => '%I. %s');
+                        open my $fh, ">>", '/tmp/tapper-receiver-util-'.$self->report->id;
+                        print $fh $backtrace;
+                        close $fh;
+                };
+
+                $self->tap($tap);
+
+                $self->write_tap_to_db();
+
+                my $harness = Tapper::TAP::Harness->new( tap => $self->tap,
+                                                         tap_is_archive => $self->report->tap->tap_is_archive );
+                $harness->evaluate_report();
+
+                $self->update_parsed_report_in_db( $harness->parsed_report );
+                $self->forward_to_level2_receivers();
+                exit 0;
+        } else {
+                # noop in parent, return immediately
+        }
+
+}
+
+1;
+
+__END__
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Tapper::Reports::Receiver::Util - Receive test reports
+
+=head2 cfg
+
+Provide Tapper config.
+
+=head2 start_new_report
+
+Create database entries to store the new report.
+
+@param string - remote host name
+@param int    - remote port
+
+@return success - report id
+
+=head2 tap_mimetype
+
+Return mimetype of received TAP (Text vs. TAP::Archive).
+
+=head2 tap_is_archive
+
+Return true when TAP is TAP::Archive.
+
+=head2 write_tap_to_db
+
+Put tap string into database.
+
+@return success - undef
+@return error   - die
+
+=head2 get_suite
+
+Get suite name from TAP.
+
+=head2 create_report_sections
+
+Divide TAP into sections (a Tapper specific extension).
+
+=head2 update_reportgroup_testrun_stats
+
+Update testrun stats where this report belongs to.
+
+=head2 create_report_groups
+
+Create reportgroup from testrun details or arbitrary IDs.
+
+=head2 create_report_comment
+
+Reports can be attached with a comment. Create this.
+
+=head2 update_parsed_report_in_db
+
+Carve out details from report and update those values in DB.
+
+=head2 forward_to_level2_receivers
+
+Load configured I<Level 2 receiver> plugins and call them with this
+report.
+
 =head2 process_request
 
 Process the tap and put it into the database.
 
 @param string - tap
 
-=cut
-
-sub process_request
-{
-        my ($self, $tap) = @_;
-
-        $self->tap($tap);
-
-        $self->write_tap_to_db();
-
-        my $harness = Tapper::TAP::Harness->new( tap => $self->tap, 
-                                                  tap_is_archive => $self->report->tap->tap_is_archive );
-        $harness->evaluate_report();
-
-        $self->update_parsed_report_in_db( $harness->parsed_report );
-
-}
-
-
-
-1;
-
-
-=head1 NAME
-
-Tapper::Reports::Receiver - Receive test reports
-
-
-=head1 SYNOPSIS
-
-    use Tapper::Reports::Receiver;
-    my $foo = Tapper::Reports::Receiver->new();
-    ...
-
 =head1 AUTHOR
 
-AMD OSRC Tapper Team, C<< <tapper at amd64.org> >>
+AMD OSRC Tapper Team <tapper@amd64.org>
 
-=head1 COPYRIGHT & LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2008-2011 AMD OSRC Tapper Team, all rights reserved.
+This software is Copyright (c) 2012 by Advanced Micro Devices, Inc..
 
-This program is released under the following license: freebsd
+This is free software, licensed under:
 
+  The (two-clause) FreeBSD License
 
 =cut
 
-1; # End of Tapper::Reports::Receiver

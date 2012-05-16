@@ -1,12 +1,18 @@
-#! perl
+#! /usr/bin/perl
+# PODNAME: tapper-reports-receiver-daemon
+# ABSTRACT: cmdline frontend to Tapper::Reports::Receiver::Daemon
 
 use strict;
 use warnings;
+use Log::Log4perl;
 
 use Tapper::Reports::Receiver::Daemon;
 
-$ENV{MX_DAEMON_STDOUT} ||= '/tmp/tapper_reports_receiver_daemon_devel_stdout.log';
-$ENV{MX_DAEMON_STDERR} ||= '/tmp/tapper_reports_receiver_daemon_devel_stderr.log';
+$ENV{MX_DAEMON_STDOUT} ||= '/var/log/tapper_reports_receiver_daemon_stdout.log';
+$ENV{MX_DAEMON_STDERR} ||= '/var/log/tapper_reports_receiver_daemon_stderr.log';
+
+my $logconf = Tapper::Config->subconfig->{files}{log4perl_cfg};
+Log::Log4perl->init($logconf);
 
 my $receiver = new Tapper::Reports::Receiver::Daemon
     (
@@ -14,3 +20,27 @@ my $receiver = new Tapper::Reports::Receiver::Daemon
     );
 
 $receiver->run;
+
+__END__
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+tapper-reports-receiver-daemon - cmdline frontend to Tapper::Reports::Receiver::Daemon
+
+=head1 AUTHOR
+
+AMD OSRC Tapper Team <tapper@amd64.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Advanced Micro Devices, Inc..
+
+This is free software, licensed under:
+
+  The (two-clause) FreeBSD License
+
+=cut
+
