@@ -3,7 +3,7 @@ BEGIN {
   $Tapper::Reports::Receiver::AUTHORITY = 'cpan:AMD';
 }
 {
-  $Tapper::Reports::Receiver::VERSION = '4.0.1';
+  $Tapper::Reports::Receiver::VERSION = '4.0.2';
 }
 # ABSTRACT: Tapper - Receiver for Tapper test reports as TAP or TAP::Archive
 

@@ -3,7 +3,7 @@ BEGIN {
   $Tapper::Reports::Receiver::Util::AUTHORITY = 'cpan:AMD';
 }
 {
-  $Tapper::Reports::Receiver::Util::VERSION = '4.0.1';
+  $Tapper::Reports::Receiver::Util::VERSION = '4.0.2';
 }
 # ABSTRACT: Receive test reports
 

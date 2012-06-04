@@ -24,6 +24,7 @@
             "AnyEvent" : "0",
             "AnyEvent::Handle" : "0",
             "AnyEvent::Socket" : "0",
+            "App::Daemon" : "0",
             "Data::DPath" : "0",
             "Data::Dumper" : "0",
             "DateTime::Format::Natural" : "0",
@@ -32,9 +33,10 @@
             "IO::Handle" : "0",
             "IO::Scalar" : "0",
             "LWP::UserAgent" : "0",
+            "LockFile::Simple" : "0.208",
             "Log::Log4perl" : "0",
+            "Module::Find" : "0.11",
             "Moose" : "0",
-            "MooseX::Daemonize" : "0",
             "MooseX::Log::Log4perl" : "0",
             "Scalar::Util" : "0",
             "Tapper::Base" : "0",
@@ -75,7 +77,7 @@
          "web" : "http://github.com/amd/Tapper-Reports-Receiver"
       }
    },
-   "version" : "4.0.1",
+   "version" : "4.0.2",
    "x_Dist_Zilla" : {
       "plugins" : [
          {
@@ -237,6 +239,17 @@
             "class" : "Dist::Zilla::Plugin::Git::Push",
             "name" : "@AMD/@Git/Push",
             "version" : "1.121010"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "runtime",
+                  "type" : "requires"
+               }
+            },
+            "name" : "Prereqs",
+            "version" : "4.300016"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
