@@ -10,6 +10,7 @@ bin/tapper-reports-receiver
 bin/tapper-reports-receiver-daemon
 dist.ini
 lib/Tapper/Reports/Receiver.pm
+lib/Tapper/Reports/Receiver/Daemon.pm
 lib/Tapper/Reports/Receiver/Level2/Codespeed.pm
 lib/Tapper/Reports/Receiver/Util.pm
 system_cfg/suse/etc/init.d/tapper_reports_receiver_daemon

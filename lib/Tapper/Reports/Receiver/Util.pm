@@ -3,7 +3,7 @@ BEGIN {
   $Tapper::Reports::Receiver::Util::AUTHORITY = 'cpan:AMD';
 }
 {
-  $Tapper::Reports::Receiver::Util::VERSION = '4.0.2';
+  $Tapper::Reports::Receiver::Util::VERSION = '4.1.0';
 }
 # ABSTRACT: Receive test reports
 
@@ -18,6 +18,8 @@ use IO::Scalar;
 use Moose;
 use YAML::Syck;
 use Devel::Backtrace;
+use Try::Tiny;
+use Sys::Syslog; # core module since 1994
 
 use Tapper::Config;
 use Tapper::Model 'model';
@@ -88,7 +90,7 @@ sub get_suite {
         $suite_name ||= 'unknown';
         $suite_type ||= 'software';
 
-        my $suite = model("ReportsDB")->resultset('Suite')->search({name => $suite_name })->first;
+        my $suite = model("ReportsDB")->resultset('Suite')->search({name => $suite_name }, {rows => 1})->first;
         if (not $suite) {
                 $suite = model("ReportsDB")->resultset('Suite')->new({
                                                                       name => $suite_name,
@@ -286,25 +288,33 @@ sub process_request
         $SIG{CHLD} = 'IGNORE';
         my $pid = fork();
         if ($pid == 0) {
-                $0 = "tapper-reports-receiver-".$self->report->id;
-                $SIG{USR1} = sub {
-                        local $SIG{USR1}  = 'ignore'; # make handler reentrant, don't handle signal twice
-                        my $backtrace = Devel::Backtrace->new(-start=>2, -format => '%I. %s');
-                        open my $fh, ">>", '/tmp/tapper-receiver-util-'.$self->report->id;
-                        print $fh $backtrace;
-                        close $fh;
+                try {
+                        $0 = "tapper-reports-receiver-".$self->report->id;
+                        $SIG{USR1} = sub {
+                                local $SIG{USR1}  = 'ignore'; # make handler reentrant, don't handle signal twice
+                                my $backtrace = Devel::Backtrace->new(-start=>2, -format => '%I. %s');
+                                open my $fh, ">>", '/tmp/tapper-receiver-util-'.$self->report->id;
+                                print $fh $backtrace;
+                                close $fh;
+                        };
+
+                        $self->tap($tap);
+
+                        $self->write_tap_to_db();
+
+                        my $harness = Tapper::TAP::Harness->new( tap => $self->tap,
+                                                                 tap_is_archive => $self->report->tap->tap_is_archive );
+                        $harness->evaluate_report();
+
+                        $self->update_parsed_report_in_db( $harness->parsed_report );
+                        $self->forward_to_level2_receivers();
+                } catch {
+                        # We can not use log4perl, because that might throw another
+                        # exception e.g. when logfile is not writable
+                        openlog('Tapper-Reports-Receiver', 'nofatal, ndelay', 'local0');
+                        syslog('ERROR', "Error in processing report and can not safely log with Log4perl: $_");
+                        closelog();
                 };
-
-                $self->tap($tap);
-
-                $self->write_tap_to_db();
-
-                my $harness = Tapper::TAP::Harness->new( tap => $self->tap,
-                                                         tap_is_archive => $self->report->tap->tap_is_archive );
-                $harness->evaluate_report();
-
-                $self->update_parsed_report_in_db( $harness->parsed_report );
-                $self->forward_to_level2_receivers();
                 exit 0;
         } else {
                 # noop in parent, return immediately

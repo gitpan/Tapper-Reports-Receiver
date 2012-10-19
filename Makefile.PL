@@ -28,8 +28,8 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Tapper-Reports-Receiver",
   "EXE_FILES" => [
-    "bin/tapper-reports-receiver",
-    "bin/tapper-reports-receiver-daemon"
+    "bin/tapper-reports-receiver-daemon",
+    "bin/tapper-reports-receiver"
   ],
   "LICENSE" => "open_source",
   "NAME" => "Tapper::Reports::Receiver",
@@ -37,7 +37,6 @@ my %WriteMakefileArgs = (
     "AnyEvent" => 0,
     "AnyEvent::Handle" => 0,
     "AnyEvent::Socket" => 0,
-    "App::Daemon" => 0,
     "Data::DPath" => 0,
     "Data::Dumper" => 0,
     "DateTime::Format::Natural" => 0,
@@ -50,17 +49,20 @@ my %WriteMakefileArgs = (
     "Log::Log4perl" => 0,
     "Module::Find" => "0.11",
     "Moose" => 0,
+    "MooseX::Daemonize" => 0,
     "MooseX::Log::Log4perl" => 0,
     "Scalar::Util" => 0,
+    "Sys::Syslog" => 0,
     "Tapper::Base" => 0,
     "Tapper::Config" => 0,
     "Tapper::Model" => 0,
     "Tapper::TAP::Harness" => 0,
+    "Try::Tiny" => 0,
     "YAML::Syck" => 0,
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "4.0.2",
+  "VERSION" => "4.1.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
