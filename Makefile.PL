@@ -55,14 +55,15 @@ my %WriteMakefileArgs = (
     "Sys::Syslog" => 0,
     "Tapper::Base" => 0,
     "Tapper::Config" => 0,
-    "Tapper::Model" => 0,
+    "Tapper::Model" => "v4.1.0",
+    "Tapper::Schema" => "v4.1.0",
     "Tapper::TAP::Harness" => 0,
     "Try::Tiny" => 0,
     "YAML::Syck" => 0,
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "4.1.0",
+  "VERSION" => "4.1.1",
   "test" => {
     "TESTS" => "t/*.t"
   }

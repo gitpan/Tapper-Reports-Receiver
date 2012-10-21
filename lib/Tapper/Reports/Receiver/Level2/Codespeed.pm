@@ -3,7 +3,7 @@ BEGIN {
   $Tapper::Reports::Receiver::Level2::Codespeed::AUTHORITY = 'cpan:AMD';
 }
 {
-  $Tapper::Reports::Receiver::Level2::Codespeed::VERSION = '4.1.0';
+  $Tapper::Reports::Receiver::Level2::Codespeed::VERSION = '4.1.1';
 }
 
 use strict;

@@ -42,7 +42,8 @@
             "Sys::Syslog" : "0",
             "Tapper::Base" : "0",
             "Tapper::Config" : "0",
-            "Tapper::Model" : "0",
+            "Tapper::Model" : "v4.1.0",
+            "Tapper::Schema" : "v4.1.0",
             "Tapper::TAP::Harness" : "0",
             "Try::Tiny" : "0",
             "YAML::Syck" : "0",
@@ -79,7 +80,7 @@
          "web" : "http://github.com/amd/Tapper-Reports-Receiver"
       }
    },
-   "version" : "4.1.0",
+   "version" : "4.1.1",
    "x_Dist_Zilla" : {
       "plugins" : [
          {

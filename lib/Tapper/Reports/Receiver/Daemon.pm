@@ -3,7 +3,7 @@ BEGIN {
   $Tapper::Reports::Receiver::Daemon::AUTHORITY = 'cpan:AMD';
 }
 {
-  $Tapper::Reports::Receiver::Daemon::VERSION = '4.1.0';
+  $Tapper::Reports::Receiver::Daemon::VERSION = '4.1.1';
 }
 
 use 5.010;
