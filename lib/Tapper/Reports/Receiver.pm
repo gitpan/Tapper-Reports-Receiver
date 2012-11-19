@@ -1,11 +1,11 @@
 package Tapper::Reports::Receiver;
-# git description: v4.1.0-1-g68bf55a
+# git description: v4.1.1-4-gc42d59f
 
 BEGIN {
-  $Tapper::Reports::Receiver::AUTHORITY = 'cpan:AMD';
+  $Tapper::Reports::Receiver::AUTHORITY = 'cpan:TAPPER';
 }
 {
-  $Tapper::Reports::Receiver::VERSION = '4.1.1';
+  $Tapper::Reports::Receiver::VERSION = '4.1.2';
 }
 # ABSTRACT: Tapper - Receiver for Tapper test reports as TAP or TAP::Archive
 

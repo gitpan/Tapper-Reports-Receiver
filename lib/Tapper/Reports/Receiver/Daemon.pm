@@ -1,9 +1,9 @@
 package Tapper::Reports::Receiver::Daemon;
 BEGIN {
-  $Tapper::Reports::Receiver::Daemon::AUTHORITY = 'cpan:AMD';
+  $Tapper::Reports::Receiver::Daemon::AUTHORITY = 'cpan:TAPPER';
 }
 {
-  $Tapper::Reports::Receiver::Daemon::VERSION = '4.1.1';
+  $Tapper::Reports::Receiver::Daemon::VERSION = '4.1.2';
 }
 
 use 5.010;

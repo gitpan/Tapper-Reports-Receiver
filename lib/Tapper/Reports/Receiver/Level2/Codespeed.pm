@@ -1,9 +1,9 @@
 package Tapper::Reports::Receiver::Level2::Codespeed;
 BEGIN {
-  $Tapper::Reports::Receiver::Level2::Codespeed::AUTHORITY = 'cpan:AMD';
+  $Tapper::Reports::Receiver::Level2::Codespeed::AUTHORITY = 'cpan:TAPPER';
 }
 {
-  $Tapper::Reports::Receiver::Level2::Codespeed::VERSION = '4.1.1';
+  $Tapper::Reports::Receiver::Level2::Codespeed::VERSION = '4.1.2';
 }
 
 use strict;
