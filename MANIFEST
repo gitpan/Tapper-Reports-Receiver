@@ -31,4 +31,6 @@ t/tap-archive-2-codespeed.tap
 t/tapper-reports-receiver-level2.t
 t/tapper-reports-receiver.t
 t/tapper.cfg
+t/tapper_schema_reportsdb_test.sqlite
+t/tapper_schema_testrundb_test.sqlite
 xt/critic.t

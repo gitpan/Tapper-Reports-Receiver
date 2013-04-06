@@ -1,11 +1,11 @@
 package Tapper::Reports::Receiver;
-# git description: v4.1.1-4-gc42d59f
+# git description: v4.1.2-3-g7874328
 
 BEGIN {
   $Tapper::Reports::Receiver::AUTHORITY = 'cpan:TAPPER';
 }
 {
-  $Tapper::Reports::Receiver::VERSION = '4.1.2';
+  $Tapper::Reports::Receiver::VERSION = '4.1.3';
 }
 # ABSTRACT: Tapper - Receiver for Tapper test reports as TAP or TAP::Archive
 
@@ -73,6 +73,7 @@ sub run
 1; # End of Tapper::Reports::Receiver
 
 __END__
+
 =pod
 
 =encoding utf-8
@@ -91,11 +92,10 @@ AMD OSRC Tapper Team <tapper@amd64.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2013 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 
   The (two-clause) FreeBSD License
 
 =cut
-

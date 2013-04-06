@@ -3,7 +3,7 @@ BEGIN {
   $Tapper::Reports::Receiver::Util::AUTHORITY = 'cpan:TAPPER';
 }
 {
-  $Tapper::Reports::Receiver::Util::VERSION = '4.1.2';
+  $Tapper::Reports::Receiver::Util::VERSION = '4.1.3';
 }
 # ABSTRACT: Receive test reports
 
@@ -68,7 +68,7 @@ sub tap_is_archive
 {
         my ($self) = shift;
 
-        return $self->tap_mimetype =~ m,application/(octet-stream|x-(compressed-tar|gzip)), ? 1 : 0;
+        return $self->tap_mimetype =~ m,application/(x-)?(octet-stream|compressed|gzip), ? 1 : 0;
 }
 
 
@@ -326,6 +326,7 @@ sub process_request
 1;
 
 __END__
+
 =pod
 
 =encoding utf-8
@@ -403,11 +404,10 @@ AMD OSRC Tapper Team <tapper@amd64.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2013 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 
   The (two-clause) FreeBSD License
 
 =cut
-

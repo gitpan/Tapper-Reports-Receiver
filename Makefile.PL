@@ -28,8 +28,8 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Tapper-Reports-Receiver",
   "EXE_FILES" => [
-    "bin/tapper-reports-receiver-daemon",
-    "bin/tapper-reports-receiver"
+    "bin/tapper-reports-receiver",
+    "bin/tapper-reports-receiver-daemon"
   ],
   "LICENSE" => "open_source",
   "NAME" => "Tapper::Reports::Receiver",
@@ -63,7 +63,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "4.1.2",
+  "VERSION" => "4.1.3",
   "test" => {
     "TESTS" => "t/*.t"
   }
